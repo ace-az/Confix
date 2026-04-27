@@ -11,6 +11,8 @@ import { usersRouter } from './routes/users';
 import { companiesRouter } from './routes/companies';
 import { notificationsRouter } from './routes/notifications';
 import { threadsRouter } from './routes/threads';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger';
 
 dotenv.config();
 
@@ -48,6 +50,22 @@ app.use((req, _res, next) => {
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Ping (for cronjob keep-alive on free-tier hosts)
+const pingHandler = (_req: any, res: any) => {
+  res.json({
+    status: 'pong',
+    timestamp: new Date().toISOString(),
+    uptime_seconds: Math.round(process.uptime()),
+  });
+};
+app.get('/ping', pingHandler);
+app.get('/api/ping', pingHandler);
+app.head('/ping', (_req, res) => res.status(200).end());
+app.head('/api/ping', (_req, res) => res.status(200).end());
+
+// Swagger API docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/reports', reportsRouter);
