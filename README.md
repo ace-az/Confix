@@ -100,3 +100,5 @@ password: admin1
 
 worker login: 54321
 password: 123456
+
+API DOCS: https://confix-jocy.onrender.com/api-docs/
